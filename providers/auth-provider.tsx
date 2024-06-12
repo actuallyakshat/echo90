@@ -1,22 +1,31 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
-import React, { createContext } from "react";
-const AuthContext = createContext<any>(null);
+import React, { createContext, useContext, useEffect, useState } from "react";
+
+interface AuthContextType {
+  loading: boolean;
+  userDetails: any;
+  isLoggedIn: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [loading, setLoading] = React.useState(true);
-  const [userDetails, setUserDetails] = React.useState<any>(null);
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [loading, setLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState<any>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { user } = useUser();
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLoading(true);
     try {
-      if (!user) return;
-      const fetchUser = async () => {
-        console.log(user?.id);
-      };
-      fetchUser();
+      if (user) {
+        setUserDetails(user);
+        setIsLoggedIn(true);
+      } else {
+        setUserDetails(null);
+        setIsLoggedIn(false);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -24,7 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [user]);
 
-  if (loading) return <div>Loading...</div>;
+  // if (loading) return <div>Loading...</div>;
 
   return (
     <AuthContext.Provider value={{ loading, userDetails, isLoggedIn }}>
@@ -34,8 +43,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useClientAuth = () => {
-  if (!React.useContext(AuthContext)) {
-    throw new Error("useAuth must be used within a AuthProvider");
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useClientAuth must be used within an AuthProvider");
   }
-  return React.useContext(AuthContext);
+  return context;
 };

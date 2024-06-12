@@ -5,5 +5,5 @@ import React from "react";
 export default async function Home() {
   const user = await currentUser();
   if (!user) redirect("/sign-in");
-  return <div>Home</div>;
+  return <div className="pt-16">Dashboard</div>;
 }
