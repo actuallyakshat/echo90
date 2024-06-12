@@ -50,8 +50,11 @@ export default function Navbar() {
               <NavbarItem key={item.id} href={item.href} title={item.title} />
             ))}
             <SignOutButton>
-              <Link href="/sign-in" className="text-sm font-medium">
-                Sign Out
+              <Link
+                href="/sign-in"
+                className="text-sm font-semibold text-foreground"
+              >
+                Logout
               </Link>
             </SignOutButton>
           </div>
